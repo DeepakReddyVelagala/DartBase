@@ -1,0 +1,97 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lipsum} % For generating dummy text
+\usepackage[margin=2cm]{geometry} % Adjust the margin size here
+\usepackage{amsmath}
+
+
+% my formulae
+\newcommand{\bold}[1]{\textbf{#1}}
+
+
+
+% Title and author
+\title{NLP CS5803 IITH Notes}
+\author{Deepak}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+The starting question is how to make computers understand human
+language. We need to find smart ways of representing the language.
+
+\section{Input Representation}
+    Consider text modality, where the input is a document, it
+    consists of words(also called tokens). The document is represented
+    by the set of words/tokens it contains.
+
+    Lets see some methods for text representation
+    
+
+    \subsection{TF-IDF scheme}
+
+        \subsubsection{Formulation}
+            The TF-IDF (Term Frequency-Inverse Document Frequency) scheme is a
+            popular technique used to represent the importance of words in a 
+            document corpus. \\
+            It combines two factors: term frequency (TF) and inverse document frequency (IDF). \\
+            \bold{TF} measures the frequency of a term in a document. 
+            It is calculated by counting the number of occurrences of a term 
+            in a document as a raw or by taking a log of it.
+
+            \[
+            \text{tf}(t, d) = \begin{cases}
+                            0 & \text{if } c(t, d) = 0 \\
+                            1 + \log(c(t, d)) & \text{if } c(t, d) \neq 0
+                        \end{cases}
+            \]
+
+            where $c(t, d)$ is the count of term $t$ in document $d$.
+            \\
+            \bold{IDF} de-emphasizes the frequent words across the corpus
+            (all documents combined is usually called corpus) and emphasizes
+            the on words differentiating the documents.
+
+            \[
+            \text{idf}(t) = \log_{10} \left( \frac{N}{\text{df}_{t}}\right)
+            \]
+            
+            where $N$ is the total number of documents in the corpus and $\text{df}_{t}$ is the number of documents containing the term $t$.
+            \\
+            The TF-IDF score for a term in a document is obtained by multiplying its TF value with its IDF value. Mathematically, it can be represented as:
+
+            \[
+            \text{tf-idf}(t, d) = \text{tf}(t, d) \times \text{idf}(t)
+            \]
+            Now we get a table with TF-IDF values.
+            
+            This way, each document is represented by a vector from the column
+            of the table and each word is presented by a vector from
+            the row of the table.
+
+            \subsubsection{Limitation}
+            \begin{itemize}
+                \item Words are considered at their lexical appearance
+                \item Synonymy is not considered
+                \item Polysemy(word with multiple meanings) is not considered
+                \item long sparse vectors
+                \item context is not considered
+            \end{itemize}
+
+            
+
+\section{Results}
+\lipsum[5-6] % Dummy text
+
+\section{Conclusion}
+\lipsum[7] % Dummy text
+
+\end{document}
