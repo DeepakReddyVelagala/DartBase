@@ -3,5 +3,7 @@
 \contentsline {subsection}{\numberline {2.1}TF-IDF scheme}{2}%
 \contentsline {subsubsection}{\numberline {2.1.1}Formulation}{2}%
 \contentsline {subsubsection}{\numberline {2.1.2}Limitation}{2}%
+\contentsline {subsection}{\numberline {2.2}SVD - text representation}{3}%
+\contentsline {subsubsection}{\numberline {2.2.1}Formulation}{3}%
 \contentsline {section}{\numberline {3}Results}{3}%
 \contentsline {section}{\numberline {4}Conclusion}{3}%

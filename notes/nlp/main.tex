@@ -86,6 +86,32 @@ language. We need to find smart ways of representing the language.
                 \item context is not considered
             \end{itemize}
 
+    \subsection{SVD - text representation}
+        \subsubsection{Formulation}
+            Consider the term-document matrix and apply SVD to it
+            to do dimensionality reduction, so that we can get dense
+            representations.
+            \\
+            Let A be the term-document matrix(matrix with freq. of words in docs), 
+            where each row represents a term and each column represents a document, 
+            by SVD we have
+
+            \[
+                A = U \Sigma V^{T}
+            \]
+            U, V are orthonormal matrices and $\Sigma$ is a diagonal matrix of 
+            singular values of A in decreasing order.
+            \\
+            By keep only the first k singular values, we have
+
+            \[
+                A_k = U_k \Sigma_k V_k^{T}
+            \]
+
+            The k here is much smaller than the original dimension of A.
+            Terms can be represented by the rows of $U_k$ and documents can be
+            represented by the columns of $V_k$.
+            
             
 
 \section{Results}
