@@ -283,6 +283,52 @@ language. We need to find smart ways of representing the language.
         the n value of 0.75 seems work well in practice, since it increase the high probability words 
         less, while low probability words more.
 
+    \subsection{GloVe}
+        Emphasizes on co-occurrence with context/ Probe word 
+        \begin{mdframed}
+            Co-occurrence Matrix:
+            \begin{itemize}
+                \item $X$: word-word co-occurrence matrix
+                \item $X_{ij}$: number of times word $j$ occur in the context of word $i$
+                \item $X_i = \sum_k X_{ik}$: the number of times any word $k$ appears in the context of word $i$
+                \item $P_{ij} = P(w_j | w_i) = \frac{X_{ij}}{X_i}$: the probability of $j$ appearing in the context of word $i$
+            \end{itemize}
+        \end{mdframed}
 
+        Focus on ratio of co-occurrence probabilities
+        Given words $w_i$, $w_j$, and $w_k$, the ratio of their co-occurrence probabilities is:
+        \[
+            F(w_i, w_j, \tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
+        \]
+        Word embeddings are linear in structures
+        so, the natural way of defining F is using subtraction and multiplication
+        \[
+            F((w_i-w_j)^T\tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
+        \]
+        , the distinction between a word and a context word is arbitrary and that we are free to 
+        exchange the two roles. To do so consistently, we must not only exchange $w \leftrightarrow 
+        \tilde{w}$ but also $X \leftrightarrow X^T$. Our final model should be invariant under this relabeling.
+        
+        However, the symmetry can be restored in two steps. \\
+        First, we require that $F$ be a 
+        homomorphism between the groups $(\bold{R},+)$ and $(\bold{R}_{>0}, \times)$, i.e.,
+        
+        \[
+            F((w_i - w_j)^T \tilde{w}_k) = \frac{F(w_i^T \tilde{w}_k)}{ F(w_j^T \tilde{w}_k)}
+        \]
 
+        which implies $F(w_i^T \tilde{w}_k) = P_{ik} = \frac{X_{ik}}{X_i}$. \\
+        then $F = \exp$, or, $w_i^T \tilde{w}_k = \log(P_{ik}) = \log(X_{ik}) - \log(X_i)$
+
+        We can observe the equation becomes symmetric if not for $log(X_i)$.
+        This term is independent of $k$ so it can be absorbed into a bias $b_i$ for $w_i$. Finally, adding an additional bias $\tilde{b}_k$ for $\tilde{w}_k$ restores the symmetry,
+        \[w_i^T \tilde{w}_k + b_i + \tilde{b}_k = \log(X_{ik}).\]
+
+        Need to weigh all co-occurrences differently, as some words
+        that happen to occur rarely or never. 
+
+        Proposed a new weighted least squares regression model that addresses these problems.
+        \[
+            J = \sum_{i,j=1}^{V} f(X_{ij}) (w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log X_{ij})^2
+        \]
 \end{document}
