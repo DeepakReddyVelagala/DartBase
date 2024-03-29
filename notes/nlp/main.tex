@@ -112,6 +112,51 @@ language. We need to find smart ways of representing the language.
             Terms can be represented by the rows of $U_k$ and documents can be
             represented by the columns of $V_k$.
             
+    \subsection{LDA - text representation}
+        \subsubsection{Formulation}
+            LDA (Latent Dirichlet Allocation) is a text representation based
+            on \bold{topics}. It assumes that each document is a mixture of 
+            topics which are latent or unknown. Words in a document depend on
+            topics of the document. LDA is a mechanism to identify the topics
+            and connect words with topics
+            \\
+            The generative process is as follows:
+            \begin{itemize}
+                \item For each document, draw a distribution over topics
+                \item For each word in the document, draw a topic from the
+                distribution over topics and then draw a word from the
+                distribution over words for that topic.
+            \end{itemize}
+            The parameters of the model are the topic distributions for each
+            document, the word distributions for each topic, and the topic
+            distribution over the entire corpus.
+            \\
+            The model is trained by maximizing the likelihood of the observed
+            documents. The topic distributions for each document and the word
+            distributions for each topic are learned from the data.
+            \\
+            The learned topic distributions for each document can be used to
+            represent the documents and the learned word distributions for each
+            topic can be used to represent the topics.
+            
+        \subsubsection{Mathematical Formulation}
+
+            The mathematical formulation of LDA is as follows:
+            
+            For each document $d$ in the corpus $D$:
+            
+            1. Choose $N \sim Poisson(\xi)$.
+            
+            2. Choose $\theta \sim Dir(\alpha)$.
+            
+            3. For each of the $N$ words $w$:
+            
+                a. Choose a topic $z \sim Multinomial(\theta)$.
+            
+                b. Choose a word $w$ from $p(w|z,\beta)$, a multinomial probability conditioned on the topic $z$.
+            
+            Here, $\xi$ is the parameter of the Poisson distribution used to choose the number of words in a document, $\alpha$ is the parameter of the Dirichlet distribution used to generate the per-document topic distributions, and $\beta$ is the parameter of the multinomial distribution used to generate the per-topic word distribution.
+            
             
 
 \section{Results}
