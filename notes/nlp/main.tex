@@ -250,14 +250,39 @@ language. We need to find smart ways of representing the language.
             \end{align*}
 
             Similar to CBOW this can also be written as error between $y^i$ and $\hat{y^i}$ .
+        \subsubsection{Negative Sampling}
+        Note that the
+        summation over |V| is computationally huge! Any update we do or
+        evaluation of the objective function would take O(|V|) time which
+        if we recall is in the millions. This is where negative sampling comes
+        to the rescue. The idea is to sample a small number of negative
+        examples (words that are not in the context of the center word).
+
+        While negative sampling is based on the Skip-Gram
+        model, it is in fact optimizing a different objective.
+
+        Consider a pair $(w, c)$ of word and context word.
+        Let's denote by $P(D = 1|w, c)$ the probability that $(w, c)$ came from the corpus data. Correspondingly, $P(D = 0|w, c)$ will be the
+        probability that $(w, c)$ did not come from the corpus data. First, let's model $P(D = 1|w, c)$ with the sigmoid function:
+        \[P(D = 1|w, c, \theta) = \frac{1}{1 + e^{-v_c^T v_w}}\]
+         
+        Now, we build a new objective function that tries to maximize the probability of a word and context being in the corpus data if it indeed is, and maximize the probability of a word and context not being in the corpus data if it indeed is not. We take a simple maximum likelihood approach of these two probabilities. (Here we take $\theta$ to be the parameters of the model, and in our case it is $V$ and $U$.)
+
+        \begin{align*}
+            \theta &= \arg\max_{\theta} \prod_{(w,c) \in D} P(D = 1|w, c, \theta) \prod_{(w,c) \in \tilde{D}} P(D = 0|w, c, \theta) \\
+            &= \arg\max_{\theta} \prod_{(w,c) \in D} P(D = 1|w, c, \theta) \prod_{(w,c) \in \tilde{D}} (1 - P(D = 1|w, c, \theta)) \\
+            &= \arg\max_{\theta} \sum_{(w,c) \in D} \log P(D = 1|w, c, \theta) + \sum_{(w,c) \in \tilde{D}} \log(1 - P(D = 1|w, c, \theta)) \\
+            &= \arg\max_{\theta} \sum_{(w,c) \in D} \log \frac{1}{1 + \exp(-u_w^T v_c)} + \sum_{(w,c) \in \tilde{D}} \log\left(1 - \frac{1}{1 + \exp(-u_w^T v_c)}\right) \\
+            &= \arg\max_{\theta} \sum_{(w,c) \in D} \log \frac{1}{1 + \exp(-u_w^T v_c)} + \sum_{(w,c) \in \tilde{D}} \log\left(\frac{1}{1 + \exp(u_w^T v_c)}\right)
+        \end{align*}
+        This changes as follows by considering k negative samples for each postive.
+        \[
+            \log \sigma(u_{c-m+j}^T v_c) + \sum_{k=1}^{K} \log \sigma(-\tilde{u}_k^T v_c)
+        \]
+        In the above formulation, $\{\tilde{u}_k | k = 1, \ldots, K\}$ are sampled from $P_n(w)$.
+        the n value of 0.75 seems work well in practice, since it increase the high probability words 
+        less, while low probability words more.
 
 
-            
-
-\section{Results}
-\lipsum[5-6] % Dummy text
-
-\section{Conclusion}
-\lipsum[7] % Dummy text
 
 \end{document}

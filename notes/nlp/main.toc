@@ -11,5 +11,4 @@
 \contentsline {subsection}{\numberline {2.4}Word2Vec}{4}%
 \contentsline {subsubsection}{\numberline {2.4.1}Continuous Bag of Words (CBOW)}{4}%
 \contentsline {subsubsection}{\numberline {2.4.2}SkipGram}{6}%
-\contentsline {section}{\numberline {3}Results}{7}%
-\contentsline {section}{\numberline {4}Conclusion}{7}%
+\contentsline {subsubsection}{\numberline {2.4.3}Negative Sampling}{7}%
