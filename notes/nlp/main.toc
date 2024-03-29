@@ -8,5 +8,8 @@
 \contentsline {subsection}{\numberline {2.3}LDA - text representation}{3}%
 \contentsline {subsubsection}{\numberline {2.3.1}Formulation}{3}%
 \contentsline {subsubsection}{\numberline {2.3.2}Mathematical Formulation}{3}%
-\contentsline {section}{\numberline {3}Results}{4}%
-\contentsline {section}{\numberline {4}Conclusion}{4}%
+\contentsline {subsection}{\numberline {2.4}Word2Vec}{4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Continuous Bag of Words (CBOW)}{4}%
+\contentsline {subsubsection}{\numberline {2.4.2}SkipGram}{6}%
+\contentsline {section}{\numberline {3}Results}{7}%
+\contentsline {section}{\numberline {4}Conclusion}{7}%

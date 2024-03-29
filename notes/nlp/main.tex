@@ -6,7 +6,8 @@
 \usepackage{lipsum} % For generating dummy text
 \usepackage[margin=2cm]{geometry} % Adjust the margin size here
 \usepackage{amsmath}
-
+\usepackage{graphicx}
+\usepackage{mdframed}
 
 % my formulae
 \newcommand{\bold}[1]{\textbf{#1}}
@@ -156,7 +157,101 @@ language. We need to find smart ways of representing the language.
                 b. Choose a word $w$ from $p(w|z,\beta)$, a multinomial probability conditioned on the topic $z$.
             
             Here, $\xi$ is the parameter of the Poisson distribution used to choose the number of words in a document, $\alpha$ is the parameter of the Dirichlet distribution used to generate the per-document topic distributions, and $\beta$ is the parameter of the multinomial distribution used to generate the per-topic word distribution.
+        
+
+    \subsection{Word2Vec}
+        \bold{Context of words}: Context of a word is the set of words that surround it.
+        For example, in the sentence "I love to eat pizza", the context of the word "love" is \{"I", "to", "eat"\}.
+        \\
+        Note: Word2Vec models rely on "distributional symmetry" hypothesis, i.e. similar words have similar contexts.
+        \\
+        Word2Vec is a popular technique used to represent words in a continuous vector space. \\
+        It is based on the idea that words that appear in similar contexts are semantically similar.
+        Word2Vec has two models: SkipGram and Continuous Bag of Words (CBOW).
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.5\textwidth]{/workspaces/DartBase/notes/nlp/images/cbow_vs_sg.png}
+        \end{figure}
+        \subsubsection{Continuous Bag of Words (CBOW)}
+            This model predicts the middle word based on the context words.
             
+            We create two matrices, $V \in \bold{R}^{n \times |V|}$ and $U \in \bold{R}^{|V| \times n}$. Where $n$ is an arbitrary size which defines the size of our embedding space.
+            \begin{mdframed}
+            $w_i$: Word $i$ from vocabulary $V$ \\
+            $V \in \bold{R}^{n \times |V|}$: Input word matrix \\
+            $v_i$: $i_{th}$ column of $V$, the input vector representation of word $w_i$\\
+            $U \in \bold{R}^{n \times |V|}$: Output word matrix\\
+            $u_i$: $i_{th}$ row of $U$, the output vector representation of word $w_i$
+            \end{mdframed}
+            Note that we do in fact learn two vectors for every word $w_i$ (i.e. input word vector $v_i$ and output word vector $u_i$).
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.5\textwidth]{/workspaces/DartBase/notes/nlp/images/cbow_net.png}
+            \end{figure}
+            also, the below steps are done using a single hidden layer neural network.\\
+            We breakdown the way this model works in these steps:
+            \begin{enumerate}
+                \item We generate our one hot word vectors $(x_{c-m}, \ldots, x_{c-1}, x_{c+1}, \ldots, x_{c+m})$ for the input context of size $m$.
+                \item We get our embedded word vectors for the context  \\
+                $(v_{c-m} = Vx_{c-m}, v_{c-m+1} = Vx_{c-m+1}, \ldots, v_{c+m} = Vx_{c+m})$.
+                \item Average these vectors to get $\hat{v} = \frac{v_{c-m} + v_{c-m+1} + \ldots + v_{c+m}}{2m}$.
+                \item Generate a score vector $z = U\hat{v}$.
+                \item Turn the scores into probabilities $\hat{y} = \text{softmax}(z)$.
+                \item We desire our probabilities generated, $\hat{y}$, to match the true probabilities, $y$, which also happens to be the one hot vector of the actual word.
+            \end{enumerate}
+            
+            Since, we have a neural network we need objective function.
+            we use a popular choice of distance/loss
+            measure, cross entropy $H(\hat{y}, y)$.
+
+            \begin{align*}
+                H(\hat{y}, y) &= -\sum_{i=1}^{|V|} y_i \log(\hat{y}_i) \\
+                &= -\log(\hat{y}_j)\\
+                &= - \log \frac{\exp(z_c)}{\sum_{j=1}^{|V|} \exp(z_j)} \\
+                &= - \log \frac{\exp(u_c^T \hat{v})}{\sum_{j=1}^{|V|} \exp(u_j^T \hat{v})} \\
+                &= - \log P(u_c|\hat{v}) \\
+                &= - \log P(w_c|w_{c-m}, \ldots, w_{c-1}, w_{c+1}, \ldots, w_{c+m})
+            \end{align*}
+            
+            Hence, it perfectly makes sense to choose the cross entropy as our loss function.
+        
+        \subsubsection{SkipGram}
+            Predicting surrounding context words given the middle word.\\
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.5\textwidth]{/workspaces/DartBase/notes/nlp/images/sg_net.png}
+            \end{figure}
+            
+            The setup is largely the same but we essentially swap our $x$ and $y$ i.e. $x$ in the CBOW are now \\ $y$ and vice-versa. 
+            The input one hot vector (center word) we will represent with an $x$ (since there is only one). 
+            And the output vectors as $y^{(j)}$. We define $V$ and $U$ the same as in CBOW.
+
+
+            We breakdown the way this model works in these 6 steps:
+            \begin{enumerate}
+                \item We generate our one hot input vector $x$.
+                \item We get our embedded word vectors for the context $v_c = Vx$.
+                \item Since there is no averaging, just set $\hat{v} = v_c$.
+                \item Generate $2m$ score vectors, $u_{c-m}, \ldots, u_{c-1}, u_{c+1}, \ldots, u_{c+m}$ using $u = Uv_c$.
+                \item Turn each of the scores into probabilities, $\hat{y} = \text{softmax}(u)$.
+                \item We desire our probability vector generated to match the true probabilities which is \\
+                 $y_{c-m}, \ldots, y_{c-1}, y_{c+1}, \ldots, y_{c+m}$, the one hot vectors of the actual output.
+            \end{enumerate}
+            
+            As in CBOW, we need to generate an objective function for us to
+            evaluate the model. A key difference here is that we invoke a Naive
+            Bayes assumption to break out the probabilities
+            \begin{align*}
+                J &= - \log P(w_{c-m}, \ldots, w_{c-1}, w_{c+1}, \ldots, w_{c+m}|w_c) \\
+                &= - \log \prod_{j=0, j \neq m}^{2m} P(w_{c-m+j}|w_c) \\
+                &= - \log \prod_{j=0, j \neq m}^{2m} P(u_{c-m+j}|v_c) \\
+                &= - \log \prod_{j=0, j \neq m}^{2m} \frac{\exp(u_{c-m+j}^T v_c)}{\sum_{k=1}^{|V|} \exp(u_k^T v_c)} \\
+                &= - \sum_{j=0, j \neq m}^{2m} u_{c-m+j}^T v_c + 2m \log \sum_{k=1}^{|V|} \exp(u_k^T v_c)
+            \end{align*}
+
+            Similar to CBOW this can also be written as error between $y^i$ and $\hat{y^i}$ .
+
+
             
 
 \section{Results}
