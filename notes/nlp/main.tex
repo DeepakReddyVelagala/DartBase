@@ -8,9 +8,8 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{mdframed}
-
-% my formulae
-\newcommand{\bold}[1]{\textbf{#1}}
+\usepackage{hyperref}
+\usepackage{amssymb}
 
 
 
@@ -44,7 +43,7 @@ language. We need to find smart ways of representing the language.
             popular technique used to represent the importance of words in a 
             document corpus. \\
             It combines two factors: term frequency (TF) and inverse document frequency (IDF). \\
-            \bold{TF} measures the frequency of a term in a document. 
+            \textbf{TF} measures the frequency of a term in a document. 
             It is calculated by counting the number of occurrences of a term 
             in a document as a raw or by taking a log of it.
 
@@ -57,7 +56,7 @@ language. We need to find smart ways of representing the language.
 
             where $c(t, d)$ is the count of term $t$ in document $d$.
             \\
-            \bold{IDF} de-emphasizes the frequent words across the corpus
+            \textbf{IDF} de-emphasizes the frequent words across the corpus
             (all documents combined is usually called corpus) and emphasizes
             the on words differentiating the documents.
 
@@ -113,10 +112,10 @@ language. We need to find smart ways of representing the language.
             Terms can be represented by the rows of $U_k$ and documents can be
             represented by the columns of $V_k$.
             
-    \subsection{LDA - text representation}
+    \subsection{LDA - text representation(incomplete)}
         \subsubsection{Formulation}
             LDA (Latent Dirichlet Allocation) is a text representation based
-            on \bold{topics}. It assumes that each document is a mixture of 
+            on \textbf{topics}. It assumes that each document is a mixture of 
             topics which are latent or unknown. Words in a document depend on
             topics of the document. LDA is a mechanism to identify the topics
             and connect words with topics
@@ -160,7 +159,7 @@ language. We need to find smart ways of representing the language.
         
 
     \subsection{Word2Vec}
-        \bold{Context of words}: Context of a word is the set of words that surround it.
+        \textbf{Context of words}: Context of a word is the set of words that surround it.
         For example, in the sentence "I love to eat pizza", the context of the word "love" is \{"I", "to", "eat"\}.
         \\
         Note: Word2Vec models rely on "distributional symmetry" hypothesis, i.e. similar words have similar contexts.
@@ -175,12 +174,12 @@ language. We need to find smart ways of representing the language.
         \subsubsection{Continuous Bag of Words (CBOW)}
             This model predicts the middle word based on the context words.
             
-            We create two matrices, $V \in \bold{R}^{n \times |V|}$ and $U \in \bold{R}^{|V| \times n}$. Where $n$ is an arbitrary size which defines the size of our embedding space.
+            We create two matrices, $V \in \textbf{R}^{n \times |V|}$ and $U \in \textbf{R}^{|V| \times n}$. Where $n$ is an arbitrary size which defines the size of our embedding space.
             \begin{mdframed}
             $w_i$: Word $i$ from vocabulary $V$ \\
-            $V \in \bold{R}^{n \times |V|}$: Input word matrix \\
+            $V \in \textbf{R}^{n \times |V|}$: Input word matrix \\
             $v_i$: $i_{th}$ column of $V$, the input vector representation of word $w_i$\\
-            $U \in \bold{R}^{n \times |V|}$: Output word matrix\\
+            $U \in \textbf{R}^{n \times |V|}$: Output word matrix\\
             $u_i$: $i_{th}$ row of $U$, the output vector representation of word $w_i$
             \end{mdframed}
             Note that we do in fact learn two vectors for every word $w_i$ (i.e. input word vector $v_i$ and output word vector $u_i$).
@@ -191,7 +190,7 @@ language. We need to find smart ways of representing the language.
             also, the below steps are done using a single hidden layer neural network.\\
             We breakdown the way this model works in these steps:
             \begin{enumerate}
-                \item We generate our one hot word vectors $(x_{c-m}, \ldots, x_{c-1}, x_{c+1}, \ldots, x_{c+m})$ for the input context of size $m$.
+                \item We generate the one hot word vectors $(x_{c-m}, \ldots, x_{c-1}, x_{c+1}, \ldots, x_{c+m})$ for the input context of size $m$.
                 \item We get our embedded word vectors for the context  \\
                 $(v_{c-m} = Vx_{c-m}, v_{c-m+1} = Vx_{c-m+1}, \ldots, v_{c+m} = Vx_{c+m})$.
                 \item Average these vectors to get $\hat{v} = \frac{v_{c-m} + v_{c-m+1} + \ldots + v_{c+m}}{2m}$.
@@ -229,18 +228,15 @@ language. We need to find smart ways of representing the language.
 
             We breakdown the way this model works in these 6 steps:
             \begin{enumerate}
-                \item We generate our one hot input vector $x$.
-                \item We get our embedded word vectors for the context $v_c = Vx$.
-                \item Since there is no averaging, just set $\hat{v} = v_c$.
-                \item Generate $2m$ score vectors, $u_{c-m}, \ldots, u_{c-1}, u_{c+1}, \ldots, u_{c+m}$ using $u = Uv_c$.
-                \item Turn each of the scores into probabilities, $\hat{y} = \text{softmax}(u)$.
-                \item We desire our probability vector generated to match the true probabilities which is \\
-                 $y_{c-m}, \ldots, y_{c-1}, y_{c+1}, \ldots, y_{c+m}$, the one hot vectors of the actual output.
+                \item We generate the one hot input vector $x$.
+                \item We get our embedded word vectors for the input vector $v_c = Vx$.
+                \item Generate the logits of size V using $u = Uv_c$.
+                \item Turn the logits into probabilities, $\hat{y} = \text{softmax}(u)$.
+                \item We desire to minimize the negative log likelihood of probabilities.
             \end{enumerate}
             
             As in CBOW, we need to generate an objective function for us to
-            evaluate the model. A key difference here is that we invoke a Naive
-            Bayes assumption to break out the probabilities
+            evaluate the model. 
             \begin{align*}
                 J &= - \log P(w_{c-m}, \ldots, w_{c-1}, w_{c+1}, \ldots, w_{c+m}|w_c) \\
                 &= - \log \prod_{j=0, j \neq m}^{2m} P(w_{c-m+j}|w_c) \\
@@ -284,51 +280,146 @@ language. We need to find smart ways of representing the language.
         less, while low probability words more.
 
     \subsection{GloVe}
-        Emphasizes on co-occurrence with context/ Probe word 
-        \begin{mdframed}
-            Co-occurrence Matrix:
+        \subsubsection{Formulation}
+            Emphasizes on co-occurrence with context/ Probe word 
+            \begin{mdframed}
+                Co-occurrence Matrix:
+                \begin{itemize}
+                    \item $X$: word-word co-occurrence matrix
+                    \item $X_{ij}$: number of times word $j$ occur in the context of word $i$
+                    \item $X_i = \sum_k X_{ik}$: the number of times any word $k$ appears in the context of word $i$
+                    \item $P_{ij} = P(w_j | w_i) = \frac{X_{ij}}{X_i}$: the probability of $j$ appearing in the context of word $i$
+                \end{itemize}
+            \end{mdframed}
+
+            Focus on ratio of co-occurrence probabilities
+            Given words $w_i$, $w_j$, and $w_k$, the ratio of their co-occurrence probabilities is:
+            \[
+                F(w_i, w_j, \tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
+            \]
+            Word embeddings are linear in structures
+            so, the natural way of defining F is using subtraction and multiplication
+            \[
+                F((w_i-w_j)^T\tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
+            \]
+            , the distinction between a word and a context word is arbitrary and that we are free to 
+            exchange the two roles. To do so consistently, we must not only exchange $w \leftrightarrow 
+            \tilde{w}$ but also $X \leftrightarrow X^T$. Our final model should be invariant under this relabeling.
+            
+            However, the symmetry can be restored in two steps. \\
+            First, we require that $F$ be a 
+            homomorphism between the groups $(\textbf{R},+)$ and $(\textbf{R}_{>0}, \times)$, i.e.,
+            
+            \[
+                F((w_i - w_j)^T \tilde{w}_k) = \frac{F(w_i^T \tilde{w}_k)}{ F(w_j^T \tilde{w}_k)}
+            \]
+
+            which implies $F(w_i^T \tilde{w}_k) = P_{ik} = \frac{X_{ik}}{X_i}$. \\
+            then $F = \exp$, or, $w_i^T \tilde{w}_k = \log(P_{ik}) = \log(X_{ik}) - \log(X_i)$
+
+            We can observe the equation becomes symmetric if not for $log(X_i)$.
+            This term is independent of $k$ so it can be absorbed into a bias $b_i$ for $w_i$. Finally, adding an additional bias $\tilde{b}_k$ for $\tilde{w}_k$ restores the symmetry,
+            \[w_i^T \tilde{w}_k + b_i + \tilde{b}_k = \log(X_{ik}).\]
+
+            Need to weigh all co-occurrences differently, as some words
+            that happen to occur rarely or never. 
+
+            Proposed a new weighted least squares regression model that addresses these problems.
+            \[
+                J = \sum_{i,j=1}^{V} f(X_{ij}) (w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log X_{ij})^2
+            \]
+
+        \subsubsection{Embeddings reflect Social bias}
+        \begin{figure}[ht]
+            \centering
+            \includegraphics[width=0.8\textwidth]{images/emb_bias.png}
+        \end{figure}
+        \subsubsection{Identifying and quantifying bias in embeddings}
+            \textbf{Aspect of bias is known}: Say "Gender"
             \begin{itemize}
-                \item $X$: word-word co-occurrence matrix
-                \item $X_{ij}$: number of times word $j$ occur in the context of word $i$
-                \item $X_i = \sum_k X_{ik}$: the number of times any word $k$ appears in the context of word $i$
-                \item $P_{ij} = P(w_j | w_i) = \frac{X_{ij}}{X_i}$: the probability of $j$ appearing in the context of word $i$
+                \item Direct bias - his refers to the alignment of a word vector with the "gender" dimension explicitly extracted from gender-specific word pairs. If a gender-neutral word like "doctor" leans closer to "he" than "she" in the embedding space, it exhibits direct gender bias.
+                \newpage
+                \begin{mdframed}
+                    \begin{itemize}
+                        \item We create a matrix with each row representing a word vector from the gendered pairs.
+                        \item We apply PCA to identify the most significant components capturing gender.
+                        \item We use the first principal component (or a combination of the first few) as the "gender" direction vector $g$.
+                        \item We calculate the cosine similarity between \texttt{w\_vec} and $g$:
+                        \[ \texttt{direct\_bias(w\_vec)} = \left| \cos(\texttt{w\_vec}, g) \right| \]
+                        \item Compute the gender component in elements from $N$ gender neutral words:
+                        \[ \texttt{DirectBias} = \frac{1}{|N|} \sum_{w \in N} \left| \cos(w, g) \right| \]
+                    \end{itemize}
+                \end{mdframed}
+
+                \item Indirect Bias and Perpendicular Component: Indirect bias arises from subtle associations in the training data. These associations might not directly align with the "gender" direction, but they can still influence the position of a word vector in the embedding space.
+                \begin{mdframed}
+                    \begin{itemize}
+                        \item Need to find the component to the perpendicular of the "gender" dimension
+                        \item Component of vector $a$ along vector $b$:
+                        \begin{itemize}
+                            \item Scalar Component: $\texttt{comp}_b(a) = \frac{a \cdot b}{|b|}$
+                            \item Vector component: $\texttt{comp}_b(a) \cdot b$
+                        \end{itemize}
+                        \item $w_g = (w \cdot g)g$, $w_{\perp} = w - w_g$
+                        \item IndirectBias $B(w,v) = \frac{w \cdot v - \frac{w_{\perp} \cdot v_{\perp}}{|w_{\perp}| \cdot |v_{\perp}|}}{w \cdot v}$
+                    \end{itemize}
+                \end{mdframed}
+                Modified objective of GloVe to minimize the bias
+                \[J = \sum_{i,j=1}^{V} f(X_{ij}) (w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log X_{ij})^2  + \lambda\cos(w_i, g) + \gamma\cos(\tilde{w}_j, g),\]
             \end{itemize}
-        \end{mdframed}
 
-        Focus on ratio of co-occurrence probabilities
-        Given words $w_i$, $w_j$, and $w_k$, the ratio of their co-occurrence probabilities is:
-        \[
-            F(w_i, w_j, \tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
-        \]
-        Word embeddings are linear in structures
-        so, the natural way of defining F is using subtraction and multiplication
-        \[
-            F((w_i-w_j)^T\tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
-        \]
-        , the distinction between a word and a context word is arbitrary and that we are free to 
-        exchange the two roles. To do so consistently, we must not only exchange $w \leftrightarrow 
-        \tilde{w}$ but also $X \leftrightarrow X^T$. Our final model should be invariant under this relabeling.
-        
-        However, the symmetry can be restored in two steps. \\
-        First, we require that $F$ be a 
-        homomorphism between the groups $(\bold{R},+)$ and $(\bold{R}_{>0}, \times)$, i.e.,
-        
-        \[
-            F((w_i - w_j)^T \tilde{w}_k) = \frac{F(w_i^T \tilde{w}_k)}{ F(w_j^T \tilde{w}_k)}
-        \]
+    \subsection{FastText}  
+        Represent words by sum of of its character n-grams
+        \subsubsection{Formulation}
+            As in skip-gram, model probability of a context word given a word
+            Given word $w$ and context word $w_c$, 
+            \[
+                P(w_c|w) = P(u_c|v) = \frac{\exp(u_c^T v)}{\sum_{j=1}^{|V|} \exp(u_j^T v)}
+            \]
+            Given a word $w$, let us denote by $G_w \subset \{1, . . . , G\}$ the set of n-grams appearing in $w$ and itself. We associate a vector representation $z_g$ to each n-gram $g$.
+            In FastText the key is to compute feature of a word using its n-grams.\
+            \[
+                v = \sum_{g \in G} z_g
+            \]
 
-        which implies $F(w_i^T \tilde{w}_k) = P_{ik} = \frac{X_{ik}}{X_i}$. \\
-        then $F = \exp$, or, $w_i^T \tilde{w}_k = \log(P_{ik}) = \log(X_{ik}) - \log(X_i)$
+            The objective function is the same as in Skip-gram.
+    \subsection{Summary - GloVe, Word2Vec, FastText}
+        \begin{itemize}
+        \item \textbf{Word2vec:}
+        \begin{itemize}
+            \item \textit{Method:} skip-gram - predicts surrounding words
+             and CBOW - predicts center word based on surrounding words.
+            \item \textit{Advantages:} Simple and efficient, good at capturing semantic relationships between words.
+            \item \textit{Disadvantages:} Doesn't handle rare words well, can be computationally expensive for large datasets.
+        \end{itemize}
+        \item \textbf{GloVe:}
+        \begin{itemize}
+            \item \textit{Method:} Analyzes word co-occurrence statistics from a corpus to build word embeddings.
+            \item \textit{Advantages:} Often performs well on analogy tasks, considers global word co-occurrence information.
+            \item \textit{Disadvantages:} May not capture fine-grained semantic relationships as effectively as word2vec, can be slower to train compared to word2vec.
+        \end{itemize}
+        \item \textbf{FastText:}
+        \begin{itemize}
+            \item \textit{Method:} Combines word n-grams (subword information) with word embeddings, allowing it to handle rare words and morphologically related words.
+            \item \textit{Advantages:} Handles out-of-vocabulary (OOV) words better than word2vec and GloVe, effective for languages with rich morphology.
+            \item \textit{Disadvantages:} Can be more complex to train compared to word2vec, might require more data for optimal performance.
+        \end{itemize}
+    \end{itemize}
+    
+    \begin{tabular}{l|cccc}
+        \textbf{Feature} & \textbf{Word2vec} & \textbf{GloVe} & \textbf{FastText} \\ \hline
+        Captures Semantics & \checkmark & \checkmark & \checkmark \\
+        Analogy Tasks  & \checkmark (skip-gram) & \checkmark  & \checkmark \\
+        Handles OOV Words & $\times$ & $\times$  & \checkmark \\
+        Morphology  & $\times$ & $\times$ & \checkmark  \\
+        Efficiency  & \checkmark  & $\times$ & \checkmark \\
+        Training Speed  & \checkmark & $\times$  & $\times$ \\
+        Context Sensitivity & $\times$  & $\times$ & $\times$ \\
+        Syntax Awareness & $\times$ & $\times$ & $\times$ \\
+        Fairness  & $\times$ & $\times$ & $\times$ \\
+        Reasoning  & $\times$ & $\times$ & $\times$
+    \end{tabular}
+\section{language Modelling and Smoothing}
 
-        We can observe the equation becomes symmetric if not for $log(X_i)$.
-        This term is independent of $k$ so it can be absorbed into a bias $b_i$ for $w_i$. Finally, adding an additional bias $\tilde{b}_k$ for $\tilde{w}_k$ restores the symmetry,
-        \[w_i^T \tilde{w}_k + b_i + \tilde{b}_k = \log(X_{ik}).\]
 
-        Need to weigh all co-occurrences differently, as some words
-        that happen to occur rarely or never. 
-
-        Proposed a new weighted least squares regression model that addresses these problems.
-        \[
-            J = \sum_{i,j=1}^{V} f(X_{ij}) (w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log X_{ij})^2
-        \]
 \end{document}
