@@ -19,4 +19,11 @@
 \BOOKMARK [2][-]{subsection.2.6}{FastText}{section.2}% 19
 \BOOKMARK [3][-]{subsubsection.2.6.1}{Formulation}{subsection.2.6}% 20
 \BOOKMARK [2][-]{subsection.2.7}{Summary - GloVe, Word2Vec, FastText}{section.2}% 21
-\BOOKMARK [1][-]{section.3}{language Modelling and Smoothing}{}% 22
+\BOOKMARK [1][-]{section.3}{Language Modelling and Smoothing}{}% 22
+\BOOKMARK [2][-]{subsection.3.1}{N-gram models}{section.3}% 23
+\BOOKMARK [2][-]{subsection.3.2}{Smoothing techniques for LMs}{section.3}% 24
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Add-One Smoothing}{subsection.3.2}% 25
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Add-k Smoothing}{subsection.3.2}% 26
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Backoff}{subsection.3.2}% 27
+\BOOKMARK [3][-]{subsubsection.3.2.4}{Interpolation}{subsection.3.2}% 28
+\BOOKMARK [3][-]{subsubsection.3.2.5}{Absolute Discounting}{subsection.3.2}% 29

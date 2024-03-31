@@ -419,7 +419,136 @@ language. We need to find smart ways of representing the language.
         Fairness  & $\times$ & $\times$ & $\times$ \\
         Reasoning  & $\times$ & $\times$ & $\times$
     \end{tabular}
-\section{language Modelling and Smoothing}
+\section{Language Modelling and Smoothing}
+    \begin{itemize}
+        \item \textbf{Language modelling is assigning probability to a text-segment/sentence}
+        \item \textbf{Usage:}
+        \begin{itemize}
+            \item \textit{Spell correction:} P(Have you seen this before) vs P(Have you scene this before)
+            \item \textit{Speech Recognition:} P(The waiter came running) vs P(The water came running)
+            \item \textit{Evaluating generated text:} P(tallest person on earth) vs P(longest person on earth)
+            \item \textit{Matching query to documents:} Conditional query-likelihood model. To be discussed later. Which document is a match according to the query’s language model.
+        \end{itemize}
+    \end{itemize}
 
+    \begin{itemize}
+        \item \textbf{Sentence \& Probabilities:}
+        \begin{itemize}
+            \item We represent a sentence $W$ as a sequence of words: $w_1, w_2, w_3, ..., w_n$.
+            \item Language modelLing deals with the probabilities of two key aspects of this sequence:
+            \begin{itemize}
+                \item $P(W)$: The probability of observing the entire sentence $W$. In other words, how likely is it that this specific sequence of words would appear in natural language?
+                \item $P(w_n | w_1, w_2, ..., w_{n-1})$: The probability of encountering the word $w_n$ at the end of the sentence, given the sequence of preceding words $w_1, w_2, ..., w_{n-1}$. This essentially predicts the next word based on the context of previous words.
+            \end{itemize}
+        \end{itemize}
+        \item \textbf{Connection Between $P(W)$ and $P(w_n | w_1, w_2, ..., w_{n-1})$:}
+        \begin{itemize}
+            \item These two probabilities are fundamentally connected through the chain rule. The chain rule allows us to break down the probability of a complex event (the entire sentence) into the product of probabilities of simpler events (individual words given the preceding context).
+        \end{itemize}
+        \item \textbf{Chain Rule Example:}
+        \begin{itemize}
+            \item The chain rule states that the probability of the entire sentence $P(w_1, w_2, w_3, ..., w_n)$ can be expressed as:
+            \item $P(w_1, w_2, w_3, ..., w_n) = P(w_1) * P(w_2 | w_1) * P(w_3 | w_1, w_2) * ... * P(w_n | w_1, w_2, ..., w_{n-1})$
+            \item Imagine the sentence "go to school". Using the chain rule, we can break down its probability as:
+            \item $P(\text{"go to school"}) = P(\text{"go"}) * P(\text{"to"} | \text{"go"}) * P(\text{"school"} | \text{"go", "to"})$
+        \end{itemize}
+    \end{itemize}
 
+    \subsection{N-gram models}
+        \begin{itemize}
+            \item \textbf{One way to estimate the probabilities in language modeling is through count-based methods.} This approach leverages the idea that the probability of a word sequence can be determined by how often it appears in a large corpus of text data.
+            \item \textbf{Here's a familiar example:}
+            \begin{itemize}
+                \item $P(w_2 | w_1) = \frac{\text{Count}(w_1w_2)}{\text{Count}(w_1)}$
+                \item This equation calculates the probability of encountering word $w_2$ following word $w_1$. We estimate this probability by:
+                \begin{itemize}
+                    \item Counting the number of times the sequence $w_1w_2$ (bigram) appears in the text data (numerator).
+                    \item Dividing this count by the total number of occurrences of word $w_1$ (denominator).
+                \end{itemize}
+            \end{itemize}
+            \item \textbf{Issues with Count-Based Estimates:}
+            \begin{itemize}
+                \item While intuitive, count-based estimates have limitations:
+                \begin{itemize}
+                    \item \textit{Data Sparsity:} Language is rich with diverse vocabulary and sentence structures. The training data might not contain every possible word sequence. This can lead to zero probabilities for unseen sequences, making the model unrealistic.
+                    \item \textit{Limited Context:} Simple n-gram models (like bigrams and trigrams) only consider a fixed window of preceding words for prediction. They fail to capture long-range dependencies in language, where words far apart in a sentence can influence each other.
+                    \item \textit{Ambiguity:} Even with large datasets, some words might have multiple common following words. Count-based methods struggle to capture the nuances of these situations.
+                \end{itemize}
+            \end{itemize}
+        \end{itemize}
+    \subsection{Smoothing techniques for LMs}
+        We saw how count-based estimates for language models suffer from data sparsity, leading to zero probabilities for unseen n-grams. This is a major problem because natural language is full of variations, and a model shouldn't assign zero probability to something it simply hasn't encountered yet.
+
+        To address this, we use techniques called smoothing. Smoothing essentially adjusts the probabilities estimated from counts to make them more realistic and handle unseen sequences.
+
+        \subsubsection{Add-One Smoothing}
+            This is a simple smoothing technique that addresses the zero probability issue. It adds 1 to the numerator (count of the sequence) and the vocabulary size ($|V|$) to the denominator for all n-grams. The smoothed estimate becomes:
+            \begin{equation}
+                P_{\text{Add-1}}(w_i | w_{i-1}) = \frac{C(w_{i-1} w_i) + 1}{C(w_{i-1}) + |V|}
+            \end{equation}
+            This ensures that no n-gram gets a zero probability, even if unseen in the training data. However, it has limitations:
+            \begin{itemize}
+                \item \textbf{Overly Uniform Distribution:} Add-one smoothing distributes the probability mass (total probability of 1) too uniformly across all n-grams, even the rare ones. This can underestimate the probabilities of frequent sequences.
+                \item \textbf{Choice of k = 1:} While adding 1 helps, the value of 1 might not be optimal for all scenarios.
+            \end{itemize}
+
+        \subsubsection{Add-k Smoothing}
+            This is a more general version of add-one smoothing. It replaces adding 1 with adding a value $k$:
+            \begin{equation}
+            P_{\text{Add-k}}(w_i | w_{i-1}) = \frac{C(w_{i-1} w_i) + k}{C(w_{i-1}) + k |V|}
+            \end{equation}
+            Here, $k$ is a smoothing parameter that you can tune. It controls the amount of probability mass to be redistributed from frequent n-grams to unseen ones.
+            
+            \textbf{Choosing the k value}
+            Unfortunately, there's no single "best" value for $k$. It depends on the specific dataset and task. Here are some approaches to choose $k$:
+            \begin{itemize}
+                \item \textbf{Held-out Validation:} Split your data into training and validation sets. Train the model with different $k$ values on the training set and evaluate their performance on the validation set. Choose the $k$ that yields the best performance metric (e.g., perplexity).
+                \item \textbf{Linguistic Knowledge:} Some studies suggest setting $k$ based on the vocabulary size or the average number of unseen n-grams encountered during training. However, these methods require domain-specific knowledge.
+            \end{itemize}
+
+        \subsubsection{Backoff}
+            Tackles the issue of unseen n-grams by gracefully "backing off" to shorter n-grams when the desired n-gram probability estimate isn't reliable. Here's the idea:
+            \begin{itemize}
+                \item If the specific n-gram (e.g., trigram) you're trying to estimate the probability for is unseen in the training data (count = 0), backoff occurs.
+                \item The model then estimates the probability using an $(n-1)$-gram model (bigram in this case). It considers the probability of the last two words $(w_{n-1}, w_n)$ conditioned only on the previous word $(w_{n-2})$.
+                \item If the $(n-1)$-gram is also unseen, the model backs off further to an even shorter n-gram model (unigram), and so on.
+                \item This process continues recursively until a reliable probability estimate can be obtained from a lower-order n-gram.
+            \end{itemize}
+        
+        \subsubsection{Interpolation}
+            Combines probabilities from different n-gram models to create a smoother probability distribution. Here's the approach:
+            \begin{itemize}
+                \item Instead of relying solely on an n-gram model (e.g., trigram), interpolation considers probabilities from multiple n-gram models (unigram, bigram, and trigram in this case).
+                \item Context-based interpolation weights ($\lambda$s) are used to determine the contribution of each n-gram model to the final probability estimate. These weights ($\lambda$s) are typically functions of the previous words in the sequence ($w_{n-2}, w_{n-1}$).
+                \item The final probability estimate for a specific n-gram becomes a weighted average of the probabilities from different n-gram models, with weights determined by the context.
+            \end{itemize}
+            Interpolation allows the model to leverage information from both short and long-range word dependencies, potentially improving prediction accuracy compared to relying solely on a single n-gram model.
+        
+        \subsubsection{Absolute Discounting}
+            Absolute discounting is a technique used to address data sparsity in n-gram language models. It works by subtracting a fixed discount (d) from the counts of n-grams (like bigrams) observed in the training data.
+            
+            \textbf{Church and Gale experiment on newswire corpus}
+            \begin{itemize}
+                \item Corpus segmented into two parts (seen/training and held-out) - each with 22M words
+                \item From the seen corpus, group together bigrams with different frequencies
+                \item For each group, count the average number of occurrences of those bigrams in the held-out corpus
+            \end{itemize}
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.8\textwidth]{images/abs_disc.png}
+            \end{figure}
+            
+            
+            We can observe that except for the held-out counts for 0 and 1 subtracting 0.75 from bigram counts in the training data provided good estimates for held-out data (unseen bigrams).
+            
+            Absolute Discounting formalizes the observation by subtracting a fixed discount (0< d < 1) from all bigram counts.
+            High-frequency bigrams (reliable counts) are minimally affected by a small discount. Low-frequency bigrams (unreliable counts) benefit from the discount, as it redistributes probability mass to unseen n-grams.
+
+            The formula incorporates the discounted bigram count, unigram probability with interpolation weight, and reflects the trade-off between discounted bigram and unigram probabilities.
+            \begin{equation}
+                P_{\text{AbsoluteDiscounting}}(w_i | w_{i-1}) = \frac{C(w_{i-1}w_i) - d}{\sum_v C(w_{i-1} v)} + \lambda(w_{i-1})P(w_i)
+            \end{equation}
+
+            While a fixed value of 0.75 might work well for some datasets, there are more principled methods to determine the discount value $d$. For instance, Ney et al.'s approach suggests determining $d$ based on unigram counts ($n_1$ and $n_2$).
+            
 \end{document}

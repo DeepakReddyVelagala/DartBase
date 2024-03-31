@@ -19,4 +19,11 @@
 \contentsline {subsection}{\numberline {2.6}FastText}{10}{subsection.2.6}%
 \contentsline {subsubsection}{\numberline {2.6.1}Formulation}{10}{subsubsection.2.6.1}%
 \contentsline {subsection}{\numberline {2.7}Summary - GloVe, Word2Vec, FastText}{11}{subsection.2.7}%
-\contentsline {section}{\numberline {3}language Modelling and Smoothing}{11}{section.3}%
+\contentsline {section}{\numberline {3}Language Modelling and Smoothing}{11}{section.3}%
+\contentsline {subsection}{\numberline {3.1}N-gram models}{12}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Smoothing techniques for LMs}{13}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Add-One Smoothing}{13}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Add-k Smoothing}{13}{subsubsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3}Backoff}{14}{subsubsection.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.4}Interpolation}{14}{subsubsection.3.2.4}%
+\contentsline {subsubsection}{\numberline {3.2.5}Absolute Discounting}{15}{subsubsection.3.2.5}%
