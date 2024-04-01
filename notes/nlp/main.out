@@ -27,3 +27,6 @@
 \BOOKMARK [3][-]{subsubsection.3.2.3}{Backoff}{subsection.3.2}% 27
 \BOOKMARK [3][-]{subsubsection.3.2.4}{Interpolation}{subsection.3.2}% 28
 \BOOKMARK [3][-]{subsubsection.3.2.5}{Absolute Discounting}{subsection.3.2}% 29
+\BOOKMARK [3][-]{subsubsection.3.2.6}{Kneser-Ney discounting}{subsection.3.2}% 30
+\BOOKMARK [3][-]{subsubsection.3.2.7}{Good-Turing Smoothing}{subsection.3.2}% 31
+\BOOKMARK [1][-]{section.4}{Discourse in NLP}{}% 32

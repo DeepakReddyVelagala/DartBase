@@ -550,5 +550,98 @@ language. We need to find smart ways of representing the language.
             \end{equation}
 
             While a fixed value of 0.75 might work well for some datasets, there are more principled methods to determine the discount value $d$. For instance, Ney et al.'s approach suggests determining $d$ based on unigram counts ($n_1$ and $n_2$).
+        
+        \subsubsection{Kneser-Ney discounting}
+            Similar to Absolute discounting the only difference is how the unigram probability is estimated
             
+            The unigram Probability $P(w)$ answers "how likely is $w$ ?"
+
+            Say "Hong Kong" is a very frequent word pair so is "Kong", and "glasses" is less frequent compared to "Hong Kong".
+            A standard unigram model would assign higher probability to "Kong" than "glasses", we want to capture the notion that
+             "Kong" is frequent in phrase "Hong Kong", but "glasses" has a much wider distribution.
+             
+           Kneser-Ney method does this by introducing $P_{\text{CONTINUATION}}$  which
+           answers the question “How likely is w to appear as a novel continuation?”
+
+           This given by number of word types seen to precede $w$ normalized by the number of words preceding all words
+           
+            \begin{equation}
+                P_{\text{CONTINUATION}}(w) \propto |\{v : C(vw) > 0\}|
+            \end{equation}
+
+            \begin{equation}
+                P_{\text{CONTINUATION}}(w) = \frac{|\{v : C(vw) > 0\}|}{\sum_{w_0} |\{v : C(vw_0) > 0\}|}
+            \end{equation}
+            
+            The final equation for interpolated Kneser-Ney smoothing for bigrams is:
+            \begin{equation}
+                P_{\text{KN}}(w_i | w_{i-1}) = \frac{\max(C(w_{i-1}w_i) - d, 0)}{C(w_{i-1})} + \lambda(w_{i-1})P_{\text{CONTINUATION}}(w_i)
+            \end{equation}
+        
+        \subsubsection{Good-Turing Smoothing}
+            The idea is to reallocate the probability mass of n-grams that occur $r+ 1$ times in the training data to the n-grams that occur $r$ times.
+            
+            In particular, reallocate the probability mass of n-grams that were seen once to the n-grams that were never seem before.
+            
+            Consider the probability mass of all the words that appear $r$ times with new probability model, $N$ denotes the total number of n-grams in the training data.
+            ,$r^*$ denotes the adjusted count for n-grams that occur $r$ times, $n_r$, $n_{r+1}$ denotes the number of n-grams that occur $r$, $r+1$ times respectively.
+            \begin{align*}
+                \sum_{w : C(w) = r} P_{GT}(w) &= \sum_{w^{'} : C(w^{'}) = r+1} P_{MLE}(w^{'}) \\
+                \implies r^* \frac{n_{r}}{N} &= (r+1) \frac{n_{r+1}}{N} \\
+                \implies r^*  &= \frac{(r + 1) n_{r+1}}{n_r}
+            \end{align*}
+            \begin{itemize}
+                \item As the frequency count ($r$) increases, there are many gaps (0 words with frequency $r$). This makes the Good-Turing (GT) estimate less reliable.
+                \item To address this issue, we calculate an adjusted count $Z_r$ from $n_r$ (the number of n-grams seen exactly $r$ times) using the formula $Z_r = \frac{2N_r}{t-q}$.
+                \item We then use the log($Z_r$)-vs-$r$ curve to estimate intermediate values for $n_r$.
+                \item This is based on the observation that $\log(n_r) = a + b*\log(r)$, where $a$ and $b$ are constants.
+                \item For large $r$ values, where the GT estimate is less reliable, we use the fitted value from the log-log plot (also known as the smoothed Good-Turing, or SGT, estimate).
+                \item For small $r$ values, where the GT estimate is reliable, we use the GT value.
+            \end{itemize}
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=0.8\textwidth]{images/GT.png}
+            \end{figure}
+            
+            Ref: \href{https://nlp.stanford.edu/~wcmac/papers/20050421-smoothing-tutorial.pdf}{https://nlp.stanford.edu/~wcmac/papers/20050421-smoothing-tutorial.pdf}
+
+
+\section{Discourse in NLP} 
+    \begin{itemize}
+        \item Coherence
+        \begin{itemize}
+            \item Ex1 : John took a train from Paris to Istanbul. He likes spinach.
+            \item Ex2 : Jane took a train from Paris to Istanbul. She had to attend a conference.
+            
+            From the above examples we can see there is a structured relation between sentences in Ex2
+            compared to Ex1. This structured relation is called Coherence.
+
+            Focuses on salient entities - does not change focus back and forth between multiple entities.
+        \end{itemize}
+        \textbf{Discourse} is a collection on sentences or text, which has Coherence.
+        \item Named Entity Recognition or parsing etc. are inside sentence but coherence is across sentences.
+        \item So, Coherence is a higher level of understanding in NLP.
+        \item \textbf{Intrinsic features in Discourse}
+            \begin{itemize}
+                \item Position, order, adjacency and context
+                \item 
+            \end{itemize}
+
+        \item Coherence as the main characteristic of discourse, for humans we recognize discourse as "it makes sense" or "its relevant".
+        \item This is used in Essay grading, summarization, detecting mental health.
+        \item A coherent discourse must have meaningful connections(i.e. coherence relations).
+        \item Discourse Relations and Connectives - may or may not be explicitly seen.
+        \item Some discourse connectives are Synchronous, Reason, Contrast, Conjunction.
+        \item How check the extent of Coherence.
+        \begin{itemize}
+            \item Lexical Chains: Often discussed as cohesion indicator, implemented systems, but not used in text quality tasks.
+            Find all words that refer to the same topic and find the correct sense of the words.
+            \item Centring theory
+            \item Entity Grid: A table with entities in rows and columns, with cells indicating the presence of a relation between entities.
+            \item Local coherence detection : Embedding based method: Coherence of thee text is the average similarity over consecutive sentence pair after representing a sentence
+             using the LSAS vectors of its words.
+            \item Local coherence discriminator - contrastive loss
+            
+        \end{itemize}
+    \end{itemize}
 \end{document}

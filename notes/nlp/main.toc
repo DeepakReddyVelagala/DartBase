@@ -27,3 +27,6 @@
 \contentsline {subsubsection}{\numberline {3.2.3}Backoff}{14}{subsubsection.3.2.3}%
 \contentsline {subsubsection}{\numberline {3.2.4}Interpolation}{14}{subsubsection.3.2.4}%
 \contentsline {subsubsection}{\numberline {3.2.5}Absolute Discounting}{15}{subsubsection.3.2.5}%
+\contentsline {subsubsection}{\numberline {3.2.6}Kneser-Ney discounting}{16}{subsubsection.3.2.6}%
+\contentsline {subsubsection}{\numberline {3.2.7}Good-Turing Smoothing}{16}{subsubsection.3.2.7}%
+\contentsline {section}{\numberline {4}Discourse in NLP}{17}{section.4}%
